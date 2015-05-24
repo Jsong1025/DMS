@@ -14,28 +14,28 @@ public class LogData {
 	private String host;	//终端IP
 
 	/* 日志文件记录长度 */
-	private static final int LOG_LENGTH = 127;
+	public static final int LOG_LENGTH = 127;
 	
 	/* 业务账号，用户属性偏移量、长度 */
-	private static final int USER_OFFSET = 0;
-	private static final int USER_LENGTH = 32;
+	public static final int USER_OFFSET = 0;
+	public static final int USER_LENGTH = 32;
 	
 	/* 进程ID pid的偏移量 */
-	private static final int PID_OFFSET = 68;
+	public static final int PID_OFFSET = 68;
 	
 	/* 登陆类型type的偏移量 */
-	private static final int TYPE_OFFSET = 72;
+	public static final int TYPE_OFFSET = 72;
 	
 	/* 登陆登出时间time的偏移量 */
-	private static final int TIME_OFFSET = 80;
+	public static final int TIME_OFFSET = 80;
 	
 	/* 终端IP host的偏移量，长度 */
-	private static final int HOST_OFFSET = 114;
-	private static final int HOST_LENGTH = 258;
+	public static final int HOST_OFFSET = 114;
+	public static final int HOST_LENGTH = 258;
 	
 	/*登陆登出状态*/
-	private static final int USER_LOGIN = 7;
-	private static final int USER_LOGOUT = 8;
+	public static final int USER_LOGIN = 7;
+	public static final int USER_LOGOUT = 8;
 
 	public LogData() {
 	}

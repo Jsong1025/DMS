@@ -1,5 +1,12 @@
 package vo;
 
+/**
+ * @author Jsong
+ * 
+ * 	登陆登出记录对实体类
+ * 		此类的一个对象，对应于一对匹配成功的登陆登出记录。
+ * 		其中包含登陆信息，登出信息，服务器IP
+ */
 public class LogRec {
 	
 	private LogData login;	//登陆

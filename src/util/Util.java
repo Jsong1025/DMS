@@ -91,7 +91,7 @@ public class Util {
 		try {
 			out = new PrintWriter(file);
 			for (Object obj: list) {
-				out.print(obj);
+				out.println(obj);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

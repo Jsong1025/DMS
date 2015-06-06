@@ -53,7 +53,7 @@ public class LogData {
 		String data[] = log.split(",");
 		this.user = data[0];
 		this.pid = Integer.parseInt(data[1]);
-		this.type = Short.parseShort(data[1]);
+		this.type = Short.parseShort(data[2]);
 		this.time = Integer.parseInt(data[3]);
 		this.host = data[4];
 	}

@@ -23,7 +23,7 @@ public class LogRec {
 		if (logout.getType() != LogData.USER_LOGOUT) {
 			throw new RuntimeException("登出状态不匹配");
 		}
-		if (login.getUser().equals(logout.getUser())) {
+		if (!login.getUser().equals(logout.getUser())) {
 			throw new RuntimeException("登陆登出用户名不一致");
 		}
 		if (login.getPid() != logout.getPid()) {

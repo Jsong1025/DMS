@@ -1,15 +1,21 @@
 package client;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 
 import util.Util;
 import vo.LogData;
+import vo.LogRec;
 
 /**
  * 客户端类
@@ -207,10 +213,12 @@ public class DMSClient {
 			fis = new FileInputStream(tempLogFile);
 			pw = new PrintWriter(txtLogFile);
 
+			// 从temp文件中逐一读取数据，转换为LogData对象
 			byte[] log = new byte[LogData.LOG_LENGTH];
 			for (int i = 0; i < batch; i++) {
 				fis.read(log);
 				LogData logData = parseLog(log);
+				//调用LogData中的toString()方法，写入log文件中
 				pw.println(logData);
 				pw.flush();
 			}
@@ -236,9 +244,181 @@ public class DMSClient {
 		return false;
 	}
 
+	/**
+	 * 从文件中读取每一条登陆信息，存入LogData的List对象中
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public List<LogData> loadLogDatas(File file){
+		List<LogData> list = new ArrayList<LogData>();
+
+		InputStream in = null;
+		InputStreamReader isr = null;
+		BufferedReader reader = null;
+		try {
+			in = new FileInputStream(file);
+			isr = new InputStreamReader(in);
+			reader = new BufferedReader(isr);
+
+			String log;
+			while ((log = reader.readLine()) != null) {
+				list.add(new LogData(log));
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (in != null) {
+					in.close();
+				}
+				if (isr != null) {
+					isr.close();
+				}
+				if (reader != null) {
+					reader.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * 从文件中读取每一条登陆信息对，存入LogRec的List对象中
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public List<LogRec> loadLogRecs(File file){
+		List<LogRec> list = new ArrayList<LogRec>();
+
+		InputStream in = null;
+		InputStreamReader isr = null;
+		BufferedReader reader = null;
+		try {
+			in = new FileInputStream(file);
+			isr = new InputStreamReader(in);
+			reader = new BufferedReader(isr);
+
+			String log;
+			while ((log = reader.readLine()) != null) {
+				list.add(new LogRec(log));
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (in != null) {
+					in.close();
+				}
+				if (isr != null) {
+					isr.close();
+				}
+				if (reader != null) {
+					reader.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * 匹配两个LogData对象是否是同一个账号的登陆登出
+	 * 
+	 * @param login		登入LogData对象
+	 * @param logout	登出LogData对象
+	 * @return			登陆登出对LogRec对象 / null
+	 */
+	public LogRec match(LogData login,LogData logout){
+		if (login.getType() != LogData.USER_LOGIN) {
+			return null;
+		}
+		if (logout.getType() != LogData.USER_LOGOUT) {
+			return null;
+		}
+		if (login.getUser().equals(logout.getUser()) &&
+				login.getHost().equals(logout.getHost()) &&
+				login.getPid() == logout.getPid() ){
+			return new LogRec(login,logout,this.serverHost);
+		}else {
+			return null;
+		}
+	}
+	
+	/**
+	 * 用一个登入LogData对象匹配LogData对象的List集合
+	 * 
+	 * @param login
+	 * @param list
+	 * @return	LogRec对象/null
+	 */
+	public LogRec matchLogouts(LogData login,List<LogData> list){
+		for (LogData logData : list) {
+			LogRec logRec = match(login, logData);
+			if (logRec != null) {
+				return logRec;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 读取未匹配的日志文件（LoginLogFile），和本次解析的日志文件（txtLogFile）
+	 * 		并进行匹配，并将匹配成对的日志保存在logRecFile文件中。
+	 * 		如果还存在未匹配成功的记录，要将之保存在LoginLogFile中
+	 * 
+	 * @return
+	 */
+	public boolean matchLog() {
+		if (!txtLogFile.exists()) {
+			throw new RuntimeException("文件不存在"+txtLogFile);
+		}
+		if (logRecFile.exists()) {
+			return true;
+		}
+		
+		List<LogData> list = loadLogDatas(txtLogFile);
+		List<LogData> loginList = new ArrayList<LogData>();
+		List<LogRec> matched = new ArrayList<LogRec>();
+		
+		if (loginLogFile.exists()) {
+			list.addAll(loadLogDatas(loginLogFile));
+			loginLogFile.delete();
+		}
+		
+		for (LogData logData : list) {
+			if (logData.getType() == LogData.USER_LOGIN) {
+				LogRec logRec = matchLogouts(logData, list);
+				if (logRec == null) {
+					loginList.add(logData);
+				} else {
+					matched.add(logRec);
+				}
+			}
+		}
+		
+		Util.saveList(loginLogFile, loginList);
+		Util.saveList(logRecFile, matched);
+		txtLogFile.delete();
+		return true;
+	}
+	
 	public static void main(String[] args) {
 		DMSClient client = new DMSClient();
 		client.readNextLog();
 		client.parseLog();
+		client.matchLog();
 	}
 }

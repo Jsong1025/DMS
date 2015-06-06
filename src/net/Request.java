@@ -13,12 +13,12 @@ import vo.LogRec;
 public class Request {
 	
 	private long time;			//时间
-	private int ip;				//IP
+	private String ip;				//IP
 	private List<LogRec> data;	//数据
 	
 	public Request() {}
 	
-	public Request(long time, int ip, List<LogRec> data) {
+	public Request(long time, String ip, List<LogRec> data) {
 		this.time = time;
 		this.ip = ip;
 		this.data = data;
@@ -28,7 +28,7 @@ public class Request {
 		return time;
 	}
 
-	public int getIp() {
+	public String getIp() {
 		return ip;
 	}
 
@@ -40,7 +40,7 @@ public class Request {
 		this.time = time;
 	}
 
-	public void setIp(int ip) {
+	public void setIp(String ip) {
 		this.ip = ip;
 	}
 

@@ -74,7 +74,34 @@ public class DMSClient {
 	 * @return
 	 */
 	public boolean isUpdate(){
-		return true;
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(logFile, "r");
+			int position = 0;
+			if (lastPositionFile.exists()) {
+				position = Util.readInt(lastPositionFile);
+			}
+			raf.seek(position);
+			if (raf.read() == -1) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			throw new RuntimeException("日志文件不存在");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (raf != null) {
+				try {
+					raf.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return false;
 	}
 	
 	/**

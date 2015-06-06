@@ -14,7 +14,7 @@ public class LogData {
 	private String host;	//终端IP
 
 	/* 日志文件记录长度 */
-	public static final int LOG_LENGTH = 127;
+	public static final int LOG_LENGTH = 372;
 	
 	/* 业务账号，用户属性偏移量、长度 */
 	public static final int USER_OFFSET = 0;

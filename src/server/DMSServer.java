@@ -52,7 +52,7 @@ public class DMSServer {
 		serverPort = 8000;
 		serverLogRecFile = new File("server_logRec");
 		queueSize = 10000;
-		saveIterval = 5000;
+		saveIterval = 500;
 	}
 	
 	/**
@@ -149,21 +149,16 @@ public class DMSServer {
 		@Override
 		public void run() {
 			try {
-				
-				// serverLogRecFile文件不存在，创建文件
-//				if (!serverLogRecFile.exists()) {
-//					serverLogRecFile.createNewFile();
-//				}
 
 				PrintWriter writer = new PrintWriter(serverLogRecFile);
 
 				// 将logRecsQueue队列中的对象依次写入serverLogRecFile文件中
+				System.out.println(logRecsQueue);
 				while (!logRecsQueue.isEmpty()) {
 					LogRec logRec = logRecsQueue.poll();
 					if (logRec == null) {
 						break;
 					} else {
-						writer.print("123");
 						writer.println(logRec);
 						System.out.println("写入文件"+logRec);
 					}

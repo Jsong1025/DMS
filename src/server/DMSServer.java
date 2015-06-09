@@ -163,6 +163,7 @@ public class DMSServer {
 					if (logRec == null) {
 						break;
 					} else {
+						writer.print("123");
 						writer.println(logRec);
 						System.out.println("写入文件"+logRec);
 					}

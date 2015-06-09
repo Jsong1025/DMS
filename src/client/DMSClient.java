@@ -208,6 +208,7 @@ public class DMSClient {
 	 * @return
 	 */
 	public boolean parseLog(){
+		
 		// txtLogFile文件已经存在，返回true
 		if (txtLogFile.exists()) {
 			return true;
@@ -245,6 +246,9 @@ public class DMSClient {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+			if (tempLogFile.exists()) {
+				tempLogFile.delete();
 			}
 		}
 		return false;
@@ -457,11 +461,88 @@ public class DMSClient {
 		}
 	}
 	
+	/**
+	 * 	进程方法，控制客户端的整体进程
+	 */
+	public void process(){
+		int n = 0;
+		int step = 0;
+		while (n++ < 4) {
+			if (stepIndexFile.exists()) {
+				step = Util.readInt(stepIndexFile);
+			}
+			System.out.println("执行步骤："+step);
+			
+			switch (step) {
+			case 0:
+				System.out.print("读入文件  . . .");
+				Util.sleep(1000);
+				if (readNextLog()) {
+					System.out.println("成功！");
+					step++;
+					Util.saveInt(stepIndexFile, step);
+				} else {
+					System.out.println("失败！");
+					Util.sleep(1000);
+				}
+				break;
+				
+			case 1:
+				System.out.print("写入文件  . . .");
+				Util.sleep(1000);
+				if (parseLog()) {
+					System.out.println("成功！");
+					step++;
+					Util.saveInt(stepIndexFile, step);
+				} else {
+					System.out.println("失败！");
+					Util.sleep(1000);
+				}
+				break;
+			case 2:
+				System.out.print("匹配数据  . . .");
+				Util.sleep(1000);
+				if (matchLog()) {
+					System.out.println("完成！");
+					step++;
+					Util.saveInt(stepIndexFile, step);
+				} else {
+					System.out.println("错误！");
+					Util.sleep(1000);
+				}
+				break;
+			case 3:
+				Util.sleep(1000);
+				if (sendLogs()) {
+					step = 0;
+					Util.saveInt(stepIndexFile, step);
+				} else {
+					Util.sleep(1000);
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * 	主逻辑方法
+	 */
+	public void action() {
+		 // 为processThread开辟新的线程，并启动
+		 processThread = new Thread(){
+			@Override
+			public void run() {
+				process();
+			} 
+		 };
+		 processThread.start();
+	}
+	
 	public static void main(String[] args) {
 		DMSClient client = new DMSClient();
-		client.readNextLog();
-		client.parseLog();
-		client.matchLog();
-		client.sendLogs();
+		client.action();
 	}
 }

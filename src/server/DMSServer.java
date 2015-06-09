@@ -49,7 +49,7 @@ public class DMSServer {
 	private BlockingDeque<LogRec> logRecsQueue;
 
 	public DMSServer() {
-		serverPort = 8888;
+		serverPort = 8000;
 		serverLogRecFile = new File("server_logRec");
 		queueSize = 10000;
 		saveIterval = 5000;
@@ -149,13 +149,13 @@ public class DMSServer {
 		@Override
 		public void run() {
 			try {
+				
 				// serverLogRecFile文件不存在，创建文件
-				if (!serverLogRecFile.exists()) {
-					serverLogRecFile.createNewFile();
-				}
+//				if (!serverLogRecFile.exists()) {
+//					serverLogRecFile.createNewFile();
+//				}
 
-				OutputStream out = new FileOutputStream(serverLogRecFile);
-				PrintWriter writer = new PrintWriter(out, true);
+				PrintWriter writer = new PrintWriter(serverLogRecFile);
 
 				// 将logRecsQueue队列中的对象依次写入serverLogRecFile文件中
 				while (!logRecsQueue.isEmpty()) {
@@ -168,7 +168,6 @@ public class DMSServer {
 					}
 				}
 
-				out.close();
 				writer.close();
 
 			} catch (IOException e) {

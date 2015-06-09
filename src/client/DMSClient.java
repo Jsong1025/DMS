@@ -10,8 +10,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.NetService;
+import net.Request;
+import net.Response;
 
 import util.Util;
 import vo.LogData;
@@ -415,10 +421,47 @@ public class DMSClient {
 		return true;
 	}
 	
+	/**
+	 * 将LogRecFile中的内容发送到服务器端
+	 * 
+	 * @return	true表示发送成功，删除LogRecFile
+	 */
+	public boolean sendLogs(){
+		NetService net = new NetService();
+		try {
+			// 创建Socket对象，并把LogRecFile中的内容封装到Request对象中
+			List<LogRec> data = loadLogRecs(logRecFile);
+			Socket socket = new Socket(DMSServerHost,DMSServerPost);
+			Request request = new Request(System.currentTimeMillis(), serverHost, data);
+			
+			//发送并接收响应
+			System.out.println("发送数据"+request);
+			net.sendRequest(socket, request);
+			Response response = net.receiveResponse(socket);
+			socket.close();
+			
+			if (response.getSate() == Response.OK) {
+				logRecFile.delete();
+				System.out.println("发送成功！");
+				return true;
+			} else {
+				System.out.println("发送失败！");
+				return false;
+			}
+		} catch (UnknownHostException e) {
+			System.out.println("发送失败！"+e.getMessage());
+			return false;
+		} catch (IOException e) {
+			System.out.println("发送失败！"+e.getMessage());
+			return false;
+		}
+	}
+	
 	public static void main(String[] args) {
 		DMSClient client = new DMSClient();
 		client.readNextLog();
 		client.parseLog();
 		client.matchLog();
+		client.sendLogs();
 	}
 }

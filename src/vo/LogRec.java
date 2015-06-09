@@ -37,7 +37,7 @@ public class LogRec {
 	
 	// 带拆分的构造方法
 	public LogRec(String log){
-		String data[] = log.split("|");
+		String data[] = log.split("\\|");
 		login = new LogData(data[0]);
 		logout = new LogData(data[1]);
 		serHost = data[2];

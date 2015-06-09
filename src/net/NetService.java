@@ -43,8 +43,8 @@ public class NetService {
 		}
 		writer.flush();
 
-		writer.close();
-		out.close();
+//		writer.close();
+//		out.close();
 	}
 
 	/**
@@ -67,8 +67,8 @@ public class NetService {
 			list.add(new LogRec(reader.readLine()));
 		}
 		
-		reader.close();
-		in.close();
+		//reader.close();
+		//in.close();
 
 		Request request = new Request(time, ip, list);
 		return request;
@@ -89,8 +89,8 @@ public class NetService {
 		writer.println(response.getSate());
 		writer.close();
 		
-		writer.close();
-		out.close();
+//		writer.close();
+//		out.close();
 	}
 
 	/**
@@ -107,8 +107,8 @@ public class NetService {
 		long time = Long.parseLong(reader.readLine());
 		int sate = Integer.parseInt(reader.readLine());
 		
-		reader.close();
-		in.close();
+//		reader.close();
+//		in.close();
 
 		Response response = new Response(time, sate);
 		return response;
